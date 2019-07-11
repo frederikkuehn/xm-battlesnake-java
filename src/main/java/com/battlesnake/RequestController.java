@@ -17,8 +17,12 @@
 package com.battlesnake;
 
 import com.battlesnake.data.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.*;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class RequestController {
@@ -78,49 +82,49 @@ public class RequestController {
         int[] head = snake.getCoords()[0];
         for (Move move : moves) {
             switch (move) {
-            case UP:
-                int[] up = head.clone();
-                up[1] = up[1] - 1;
+                case UP:
+                    int[] up = head.clone();
+                    up[1] = up[1] - 1;
 
-                int[] up2 = head.clone();
-                up2[1] = up2[1] - 2;
+                    int[] up2 = head.clone();
+                    up2[1] = up2[1] - 2;
 
-                if (!collideWithSnake(snake, up) && !collideWithSnake(snake, up2)) {
-                    return Move.UP;
-                }
-                break;
-            case DOWN:
-                int[] down = head.clone();
-                down[1] = down[1] + 1;
+                    if (!collideWithSnake(snake, up) && !collideWithSnake(snake, up2)) {
+                        return Move.UP;
+                    }
+                    break;
+                case DOWN:
+                    int[] down = head.clone();
+                    down[1] = down[1] + 1;
 
-                int[] down2 = head.clone();
-                down2[1] = down2[1] + 2;
+                    int[] down2 = head.clone();
+                    down2[1] = down2[1] + 2;
 
-                if (!collideWithSnake(snake, down) && !collideWithSnake(snake, down2)) {
-                    return Move.DOWN;
-                }
-                break;
-            case LEFT:
-                int[] left = head.clone();
-                left[0] = left[0] - 1;
+                    if (!collideWithSnake(snake, down) && !collideWithSnake(snake, down2)) {
+                        return Move.DOWN;
+                    }
+                    break;
+                case LEFT:
+                    int[] left = head.clone();
+                    left[0] = left[0] - 1;
 
-                int[] left2 = head.clone();
-                left2[0] = left2[0] - 1;
+                    int[] left2 = head.clone();
+                    left2[0] = left2[0] - 1;
 
-                if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2)) {
-                    return Move.LEFT;
-                }
-                break;
-            case RIGHT:
-                int[] right = head.clone();
-                right[0] = right[0] + 1;
+                    if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2)) {
+                        return Move.LEFT;
+                    }
+                    break;
+                case RIGHT:
+                    int[] right = head.clone();
+                    right[0] = right[0] + 1;
 
-                int[] right2 = head.clone();
-                right2[0] = right2[0] + 1;
+                    int[] right2 = head.clone();
+                    right2[0] = right2[0] + 1;
 
-                if (!collideWithSnake(snake, right) && !collideWithSnake(snake, right2)) {
-                    return Move.RIGHT;
-                }
+                    if (!collideWithSnake(snake, right) && !collideWithSnake(snake, right2)) {
+                        return Move.RIGHT;
+                    }
             }
         }
         return null;
@@ -135,7 +139,7 @@ public class RequestController {
 
     /*
      *  Go through the snakes and find your team's snake
-     *  
+     *
      *  @param  request The MoveRequest from the server
      *  @return         Your team's snake
      */
@@ -147,7 +151,7 @@ public class RequestController {
 
     /*
      *  Simple algorithm to find food
-     *  
+     *
      *  @param  request The MoveRequest from the server
      *  @param  request An integer array with the X,Y coordinates of your snake's head
      *  @return         A Move that gets you closer to food
@@ -155,7 +159,8 @@ public class RequestController {
     public ArrayList<Move> moveTowardsFood(MoveRequest request, int[] mySnakeHead) {
         ArrayList<Move> towardsFoodMoves = new ArrayList<>();
 
-        int[] firstFoodLocation = request.getFood()[0];
+
+        int[] firstFoodLocation = findClosestFood(request.getFood(), mySnakeHead);
 
         if (firstFoodLocation[0] < mySnakeHead[0]) {
             towardsFoodMoves.add(Move.LEFT);
@@ -174,6 +179,21 @@ public class RequestController {
         }
 
         return towardsFoodMoves;
+    }
+
+    private int[] findClosestFood(int[][] food, int[] mySnakeHead) {
+        int[] closestLocation = food[0];
+        int closestDistance = Integer.MAX_VALUE;
+        for (int[] location : food) {
+            int distanceX = Math.abs(mySnakeHead[0] - location[0]);
+            int distanceY = Math.abs(mySnakeHead[1] - location[1]);
+            int distance = distanceX + distanceY;
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestLocation = location.clone();
+            }
+        }
+        return closestLocation;
     }
 
     public boolean collideWithSnake(Snake snake, int[] coords) {
