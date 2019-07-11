@@ -140,8 +140,6 @@ public class RequestController {
                         if (valid) {
                             return Move.LEFT;
                         }
-                    if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2) && isWithinBounds(request, left)) {
-                        return Move.LEFT;
                     }
                     break;
                 case RIGHT:
