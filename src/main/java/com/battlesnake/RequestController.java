@@ -45,12 +45,26 @@ public class RequestController {
         if (towardsFoodMoves != null && !towardsFoodMoves.isEmpty()) {
             Move move = getValidMove(towardsFoodMoves, mySnake);
             if (move == null) {
-
+                // les go over the other valid options
+                List<Move> newMoves = getNewMoves(towardsFoodMoves);
+                move = getValidMove(newMoves, mySnake);
             }
             return moveResponse.setMove(move).setTaunt("I'm hungry");
         } else {
             return moveResponse.setMove(Move.DOWN).setTaunt("Oh Drat");
         }
+    }
+
+    List<Move> getNewMoves(List<Move> towardsFoodMoves) {
+        Set<Move> allMoves = new HashSet<>(Arrays.asList(Move.values()));
+
+        List<Move> newMoves = new ArrayList<>();
+        for (Move move : allMoves) {
+            if (!towardsFoodMoves.contains(move)) {
+                newMoves.add(move);
+            }
+        }
+        return newMoves;
     }
 
     private Move getValidMove(List<Move> moves, Snake snake) {
