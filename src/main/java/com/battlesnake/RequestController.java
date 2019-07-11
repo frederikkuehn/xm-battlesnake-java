@@ -55,6 +55,13 @@ public class RequestController {
         }
     }
 
+    boolean isOutOfBounds(MoveRequest request, Snake snake) {
+        int width = request.getWidth();
+        int height = request.getHeight();
+
+        return false;
+    }
+
     List<Move> getNewMoves(List<Move> towardsFoodMoves) {
         Set<Move> allMoves = new HashSet<>(Arrays.asList(Move.values()));
 
@@ -74,28 +81,44 @@ public class RequestController {
             case UP:
                 int[] up = head.clone();
                 up[1] = up[1] - 1;
-                if (!collideWithSnake(snake, up)) {
+
+                int[] up2 = head.clone();
+                up2[1] = up2[1] - 2;
+
+                if (!collideWithSnake(snake, up) && !collideWithSnake(snake, up2)) {
                     return Move.UP;
                 }
                 break;
             case DOWN:
                 int[] down = head.clone();
                 down[1] = down[1] + 1;
-                if (!collideWithSnake(snake, down)) {
+
+                int[] down2 = head.clone();
+                down2[1] = down2[1] + 2;
+
+                if (!collideWithSnake(snake, down) && !collideWithSnake(snake, down2)) {
                     return Move.DOWN;
                 }
                 break;
             case LEFT:
                 int[] left = head.clone();
                 left[0] = left[0] - 1;
-                if (!collideWithSnake(snake, left)) {
+
+                int[] left2 = head.clone();
+                left2[0] = left2[0] - 1;
+
+                if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2)) {
                     return Move.LEFT;
                 }
                 break;
             case RIGHT:
                 int[] right = head.clone();
                 right[0] = right[0] + 1;
-                if (!collideWithSnake(snake, right)) {
+
+                int[] right2 = head.clone();
+                right2[0] = right2[0] + 1;
+
+                if (!collideWithSnake(snake, right) && !collideWithSnake(snake, right2)) {
                     return Move.RIGHT;
                 }
             }
