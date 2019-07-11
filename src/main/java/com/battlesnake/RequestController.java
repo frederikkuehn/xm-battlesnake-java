@@ -30,7 +30,7 @@ public class RequestController {
     @RequestMapping(value = "/start", method = RequestMethod.POST, produces = "application/json")
     public StartResponse start(@RequestBody StartRequest request) {
         return new StartResponse()
-                .setName("I eat snakes for breakfast")
+                .setName("Simple Snake")
                 .setColor("#FF3497")
                 .setHeadUrl("http://vignette1.wikia.nocookie.net/nintendo/images/6/61/Bowser_Icon.png/revision/latest?cb=20120820000805&path-prefix=en")
                 .setHeadType(HeadType.DEAD)
@@ -47,11 +47,11 @@ public class RequestController {
         List<Move> towardsFoodMoves = moveTowardsFood(request, mySnake.getCoords()[0]);
 
         if (towardsFoodMoves != null && !towardsFoodMoves.isEmpty()) {
-            Move move = getValidMove(towardsFoodMoves, mySnake, request.getSnakes(), request);
+            Move move = getValidMove(towardsFoodMoves, mySnake, request);
             if (move == null) {
                 // les go over the other valid options
                 List<Move> newMoves = getNewMoves(towardsFoodMoves);
-                move = getValidMove(newMoves, mySnake, request.getSnakes(), request);
+                move = getValidMove(newMoves, mySnake, request);
             }
             return moveResponse.setMove(move).setTaunt("I'm hungry");
         } else {
@@ -81,8 +81,8 @@ public class RequestController {
         return newMoves;
     }
 
-    private Move getValidMove(List<Move> moves, Snake mySnake, List<Snake> snakes, MoveRequest request) {
-        int[] head = mySnake.getCoords()[0];
+    private Move getValidMove(List<Move> moves, Snake snake, MoveRequest request) {
+        int[] head = snake.getCoords()[0];
         for (Move move : moves) {
             switch (move) {
                 case UP:
@@ -92,11 +92,9 @@ public class RequestController {
                     int[] up2 = head.clone();
                     up2[1] = up2[1] - 2;
 
-                    for (Snake snake : snakes) {
-                        if (!collideWithSnake(snake, up) && !collideWithSnake(snake, up2) && isOutOfBounds(request, up)) {
+                    if (!collideWithSnake(snake, up) && !collideWithSnake(snake, up2) && isOutOfBounds(request, up)) {
 
-                            return Move.UP;
-                        }
+                        return Move.UP;
                     }
                     break;
                 case DOWN:
@@ -106,10 +104,8 @@ public class RequestController {
                     int[] down2 = head.clone();
                     down2[1] = down2[1] + 2;
 
-                    for (Snake snake : snakes) {
-                        if (!collideWithSnake(snake, down) && !collideWithSnake(snake, down2) && isOutOfBounds(request, down)) {
-                            return Move.DOWN;
-                        }
+                    if (!collideWithSnake(snake, down) && !collideWithSnake(snake, down2) && isOutOfBounds(request, down)) {
+                        return Move.DOWN;
                     }
                     break;
                 case LEFT:
@@ -119,11 +115,8 @@ public class RequestController {
                     int[] left2 = head.clone();
                     left2[0] = left2[0] - 1;
 
-
-                    for (Snake snake : snakes) {
-                        if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2) && isOutOfBounds(request, left)) {
-                            return Move.LEFT;
-                        }
+                    if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2) && isOutOfBounds(request, left)) {
+                        return Move.LEFT;
                     }
                     break;
                 case RIGHT:
@@ -133,11 +126,8 @@ public class RequestController {
                     int[] right2 = head.clone();
                     right2[0] = right2[0] + 1;
 
-
-                    for (Snake snake : snakes) {
-                        if (!collideWithSnake(snake, right) && !collideWithSnake(snake, right2) && isOutOfBounds(request, right)) {
-                            return Move.RIGHT;
-                        }
+                    if (!collideWithSnake(snake, right) && !collideWithSnake(snake, right2) && isOutOfBounds(request, right)) {
+                        return Move.RIGHT;
                     }
             }
         }
@@ -174,8 +164,7 @@ public class RequestController {
         ArrayList<Move> towardsFoodMoves = new ArrayList<>();
 
 
-//        int[] firstFoodLocation = findClosestFood(request.getFood(), mySnakeHead);
-        int[] firstFoodLocation = request.getFood()[0];
+        int[] firstFoodLocation = findClosestFood(request.getFood(), mySnakeHead);
 
         if (firstFoodLocation[0] < mySnakeHead[0]) {
             towardsFoodMoves.add(Move.LEFT);
