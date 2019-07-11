@@ -59,7 +59,7 @@ public class RequestController {
         }
     }
 
-    boolean isOutOfBounds(MoveRequest request, int[] coords) {
+    boolean isWithinBounds(MoveRequest request, int[] coords) {
         int width = request.getWidth() - 1;
         int height = request.getHeight() - 1;
 
@@ -92,7 +92,7 @@ public class RequestController {
 
                     int[] up2 = head.clone();
                     up2[1] = up2[1] - 2;
-                    if (isOutOfBounds(request, up)) {
+                    if (isWithinBounds(request, up)) {
                         boolean valid = true;
                         for (Snake snake : snakes) {
                             if (collideWithSnake(snake, up) || collideWithSnake(snake, up2)) {
@@ -111,7 +111,7 @@ public class RequestController {
                     int[] down2 = head.clone();
                     down2[1] = down2[1] + 2;
 
-                    if (isOutOfBounds(request, down)) {
+                    if (isWithinBounds(request, down)) {
                         boolean valid = true;
                         for (Snake snake : snakes) {
                             if (collideWithSnake(snake, down) || collideWithSnake(snake, down2)) {
@@ -128,9 +128,9 @@ public class RequestController {
                     left[0] = left[0] - 1;
 
                     int[] left2 = head.clone();
-                    left2[0] = left2[0] - 1;
+                    left2[0] = left2[0] - 2;
 
-                    if (isOutOfBounds(request, left)) {
+                    if (isWithinBounds(request, left)) {
                         boolean valid = true;
                         for (Snake snake : snakes) {
                             if (collideWithSnake(snake, left) || collideWithSnake(snake, left2)) {
@@ -140,6 +140,8 @@ public class RequestController {
                         if (valid) {
                             return Move.LEFT;
                         }
+                    if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2) && isWithinBounds(request, left)) {
+                        return Move.LEFT;
                     }
                     break;
                 case RIGHT:
@@ -147,9 +149,9 @@ public class RequestController {
                     right[0] = right[0] + 1;
 
                     int[] right2 = head.clone();
-                    right2[0] = right2[0] + 1;
+                    right2[0] = right2[0] + 2;
 
-                    if (isOutOfBounds(request, right)) {
+                    if (isWithinBounds(request, right)) {
                         boolean valid = true;
                         for (Snake snake : snakes) {
                             if (collideWithSnake(snake, right) || collideWithSnake(snake, right2)) {
