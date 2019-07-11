@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class RequestController {
 
-    @RequestMapping(value="/start", method=RequestMethod.POST, produces="application/json")
+    @RequestMapping(value = "/start", method = RequestMethod.POST, produces = "application/json")
     public StartResponse start(@RequestBody StartRequest request) {
         return new StartResponse()
                 .setName("Simple Snake")
@@ -34,22 +34,62 @@ public class RequestController {
                 .setTaunt("I can find food!");
     }
 
-    @RequestMapping(value="/move", method=RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value = "/move", method = RequestMethod.POST, produces = "application/json")
     public MoveResponse move(@RequestBody MoveRequest request) {
         MoveResponse moveResponse = new MoveResponse();
-        
+
         Snake mySnake = findOurSnake(request); // kind of handy to have our snake at this level
-        
+
         List<Move> towardsFoodMoves = moveTowardsFood(request, mySnake.getCoords()[0]);
-        
+
         if (towardsFoodMoves != null && !towardsFoodMoves.isEmpty()) {
-            return moveResponse.setMove(towardsFoodMoves.get(0)).setTaunt("I'm hungry");
+            Move move = getValidMove(towardsFoodMoves, mySnake);
+            if (move == null) {
+
+            }
+            return moveResponse.setMove(move).setTaunt("I'm hungry");
         } else {
             return moveResponse.setMove(Move.DOWN).setTaunt("Oh Drat");
         }
     }
 
-    @RequestMapping(value="/end", method=RequestMethod.POST)
+    private Move getValidMove(List<Move> moves, Snake snake) {
+        int[] head = snake.getCoords()[0];
+        for (Move move : moves) {
+            switch (move) {
+            case UP:
+                int[] up = head.clone();
+                up[1] = up[1] - 1;
+                if (!collideWithSnake(snake, up)) {
+                    return Move.UP;
+                }
+                break;
+            case DOWN:
+                int[] down = head.clone();
+                down[1] = down[1] + 1;
+                if (!collideWithSnake(snake, down)) {
+                    return Move.DOWN;
+                }
+                break;
+            case LEFT:
+                int[] left = head.clone();
+                left[0] = left[0] - 1;
+                if (!collideWithSnake(snake, left)) {
+                    return Move.LEFT;
+                }
+                break;
+            case RIGHT:
+                int[] right = head.clone();
+                right[0] = right[0] + 1;
+                if (!collideWithSnake(snake, right)) {
+                    return Move.RIGHT;
+                }
+            }
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/end", method = RequestMethod.POST)
     public Object end() {
         // No response required
         Map<String, Object> responseObject = new HashMap<String, Object>();
@@ -68,14 +108,13 @@ public class RequestController {
         return snakes.stream().filter(thisSnake -> thisSnake.getId().equals(myUuid)).findFirst().orElse(null);
     }
 
-
     /*
      *  Simple algorithm to find food
      *  
      *  @param  request The MoveRequest from the server
      *  @param  request An integer array with the X,Y coordinates of your snake's head
      *  @return         A Move that gets you closer to food
-     */    
+     */
     public ArrayList<Move> moveTowardsFood(MoveRequest request, int[] mySnakeHead) {
         ArrayList<Move> towardsFoodMoves = new ArrayList<>();
 
@@ -98,6 +137,16 @@ public class RequestController {
         }
 
         return towardsFoodMoves;
+    }
+
+    public boolean collideWithSnake(Snake snake, int[] coords) {
+
+        for (int[] body : snake.getCoords()) {
+            if (body[0] == coords[0] && body[1] == coords[1]) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
