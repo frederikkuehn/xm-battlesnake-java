@@ -47,11 +47,11 @@ public class RequestController {
         List<Move> towardsFoodMoves = moveTowardsFood(request, mySnake.getCoords()[0]);
 
         if (towardsFoodMoves != null && !towardsFoodMoves.isEmpty()) {
-            Move move = getValidMove(towardsFoodMoves, mySnake, request.getSnakes());
+            Move move = getValidMove(towardsFoodMoves, mySnake, request.getSnakes(), request);
             if (move == null) {
                 // les go over the other valid options
                 List<Move> newMoves = getNewMoves(towardsFoodMoves);
-                move = getValidMove(newMoves, mySnake, request.getSnakes());
+                move = getValidMove(newMoves, mySnake, request.getSnakes(), request);
             }
             return moveResponse.setMove(move).setTaunt("I'm hungry");
         } else {
@@ -59,11 +59,14 @@ public class RequestController {
         }
     }
 
-    boolean isOutOfBounds(MoveRequest request, Snake snake) {
-        int width = request.getWidth();
-        int height = request.getHeight();
+    boolean isOutOfBounds(MoveRequest request, int[] coords) {
+        int width = request.getWidth() - 1;
+        int height = request.getHeight() - 1;
 
-        return false;
+        if(coords[0] < 0 || coords[0] > width || coords[1] < 0 || coords[1] > height) {
+            return false;
+        }
+        return true;
     }
 
     List<Move> getNewMoves(List<Move> towardsFoodMoves) {
@@ -78,7 +81,7 @@ public class RequestController {
         return newMoves;
     }
 
-    private Move getValidMove(List<Move> moves, Snake mySnake, List<Snake> snakes) {
+    private Move getValidMove(List<Move> moves, Snake mySnake, List<Snake> snakes, MoveRequest request) {
         int[] head = mySnake.getCoords()[0];
         for (Move move : moves) {
             switch (move) {
@@ -90,7 +93,8 @@ public class RequestController {
                     up2[1] = up2[1] - 2;
 
                     for (Snake snake : snakes) {
-                        if (!collideWithSnake(snake, up) && !collideWithSnake(snake, up2)) {
+                        if (!collideWithSnake(snake, up) && !collideWithSnake(snake, up2) && isOutOfBounds(request, up)) {
+
                             return Move.UP;
                         }
                     }
@@ -103,7 +107,7 @@ public class RequestController {
                     down2[1] = down2[1] + 2;
 
                     for (Snake snake : snakes) {
-                        if (!collideWithSnake(snake, down) && !collideWithSnake(snake, down2)) {
+                        if (!collideWithSnake(snake, down) && !collideWithSnake(snake, down2) && isOutOfBounds(request, down)) {
                             return Move.DOWN;
                         }
                     }
@@ -117,7 +121,7 @@ public class RequestController {
 
 
                     for (Snake snake : snakes) {
-                        if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2)) {
+                        if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2) && isOutOfBounds(request, left)) {
                             return Move.LEFT;
                         }
                     }
@@ -131,7 +135,7 @@ public class RequestController {
 
 
                     for (Snake snake : snakes) {
-                        if (!collideWithSnake(snake, right) && !collideWithSnake(snake, right2)) {
+                        if (!collideWithSnake(snake, right) && !collideWithSnake(snake, right2) && isOutOfBounds(request, right)) {
                             return Move.RIGHT;
                         }
                     }
@@ -208,12 +212,19 @@ public class RequestController {
     }
 
     public boolean collideWithSnake(Snake snake, int[] coords) {
-
-        for (int[] body : snake.getCoords()) {
+        // ignore tail
+        for (int i = 0; i < snake.getCoords().length - 1; i++) {
+            int [] body = snake.getCoords()[i];
             if (body[0] == coords[0] && body[1] == coords[1]) {
                 return true;
             }
         }
+
+//        for (int[] body : snake.getCoords()) {
+//            if (body[0] == coords[0] && body[1] == coords[1]) {
+//                return true;
+//            }
+//        }
         return false;
     }
 
