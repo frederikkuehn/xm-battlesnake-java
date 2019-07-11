@@ -30,7 +30,7 @@ public class RequestController {
     @RequestMapping(value = "/start", method = RequestMethod.POST, produces = "application/json")
     public StartResponse start(@RequestBody StartRequest request) {
         return new StartResponse()
-                .setName("Simple Snake")
+                .setName("Team snake")
                 .setColor("#FF3497")
                 .setHeadUrl("http://vignette1.wikia.nocookie.net/nintendo/images/6/61/Bowser_Icon.png/revision/latest?cb=20120820000805&path-prefix=en")
                 .setHeadType(HeadType.DEAD)
@@ -63,7 +63,7 @@ public class RequestController {
         int width = request.getWidth() - 1;
         int height = request.getHeight() - 1;
 
-        if(coords[0] < 0 || coords[0] > width || coords[1] < 0 || coords[1] > height) {
+        if (coords[0] < 0 || coords[0] > width || coords[1] < 0 || coords[1] > height) {
             return false;
         }
         return true;
@@ -81,8 +81,9 @@ public class RequestController {
         return newMoves;
     }
 
-    private Move getValidMove(List<Move> moves, Snake snake, MoveRequest request) {
-        int[] head = snake.getCoords()[0];
+    private Move getValidMove(List<Move> moves, Snake mySnake, MoveRequest request) {
+        ArrayList<Snake> snakes = request.getSnakes();
+        int[] head = mySnake.getCoords()[0];
         for (Move move : moves) {
             switch (move) {
                 case UP:
@@ -91,10 +92,16 @@ public class RequestController {
 
                     int[] up2 = head.clone();
                     up2[1] = up2[1] - 2;
-
-                    if (!collideWithSnake(snake, up) && !collideWithSnake(snake, up2) && isOutOfBounds(request, up)) {
-
-                        return Move.UP;
+                    if (isOutOfBounds(request, up)) {
+                        boolean valid = true;
+                        for (Snake snake : snakes) {
+                            if (collideWithSnake(snake, up) || collideWithSnake(snake, up2)) {
+                                valid = false;
+                            }
+                        }
+                        if (valid) {
+                            return Move.UP;
+                        }
                     }
                     break;
                 case DOWN:
@@ -104,8 +111,16 @@ public class RequestController {
                     int[] down2 = head.clone();
                     down2[1] = down2[1] + 2;
 
-                    if (!collideWithSnake(snake, down) && !collideWithSnake(snake, down2) && isOutOfBounds(request, down)) {
-                        return Move.DOWN;
+                    if (isOutOfBounds(request, down)) {
+                        boolean valid = true;
+                        for (Snake snake : snakes) {
+                            if (collideWithSnake(snake, down) || collideWithSnake(snake, down2)) {
+                                valid = false;
+                            }
+                        }
+                        if (valid) {
+                            return Move.DOWN;
+                        }
                     }
                     break;
                 case LEFT:
@@ -115,8 +130,16 @@ public class RequestController {
                     int[] left2 = head.clone();
                     left2[0] = left2[0] - 1;
 
-                    if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2) && isOutOfBounds(request, left)) {
-                        return Move.LEFT;
+                    if (isOutOfBounds(request, left)) {
+                        boolean valid = true;
+                        for (Snake snake : snakes) {
+                            if (collideWithSnake(snake, left) || collideWithSnake(snake, left2)) {
+                                valid = false;
+                            }
+                        }
+                        if (valid) {
+                            return Move.LEFT;
+                        }
                     }
                     break;
                 case RIGHT:
@@ -126,8 +149,16 @@ public class RequestController {
                     int[] right2 = head.clone();
                     right2[0] = right2[0] + 1;
 
-                    if (!collideWithSnake(snake, right) && !collideWithSnake(snake, right2) && isOutOfBounds(request, right)) {
-                        return Move.RIGHT;
+                    if (isOutOfBounds(request, right)) {
+                        boolean valid = true;
+                        for (Snake snake : snakes) {
+                            if (collideWithSnake(snake, right) || collideWithSnake(snake, right2)) {
+                                valid = false;
+                            }
+                        }
+                        if (valid) {
+                            return Move.RIGHT;
+                        }
                     }
             }
         }
@@ -203,7 +234,7 @@ public class RequestController {
     public boolean collideWithSnake(Snake snake, int[] coords) {
         // ignore tail
         for (int i = 0; i < snake.getCoords().length - 1; i++) {
-            int [] body = snake.getCoords()[i];
+            int[] body = snake.getCoords()[i];
             if (body[0] == coords[0] && body[1] == coords[1]) {
                 return true;
             }
