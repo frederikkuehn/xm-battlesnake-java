@@ -59,7 +59,7 @@ public class RequestController {
         }
     }
 
-    boolean isOutOfBounds(MoveRequest request, int[] coords) {
+    boolean isWithinBounds(MoveRequest request, int[] coords) {
         int width = request.getWidth() - 1;
         int height = request.getHeight() - 1;
 
@@ -92,7 +92,7 @@ public class RequestController {
                     int[] up2 = head.clone();
                     up2[1] = up2[1] - 2;
 
-                    if (!collideWithSnake(snake, up) && !collideWithSnake(snake, up2) && isOutOfBounds(request, up)) {
+                    if (!collideWithSnake(snake, up) && !collideWithSnake(snake, up2) && isWithinBounds(request, up)) {
 
                         return Move.UP;
                     }
@@ -104,7 +104,7 @@ public class RequestController {
                     int[] down2 = head.clone();
                     down2[1] = down2[1] + 2;
 
-                    if (!collideWithSnake(snake, down) && !collideWithSnake(snake, down2) && isOutOfBounds(request, down)) {
+                    if (!collideWithSnake(snake, down) && !collideWithSnake(snake, down2) && isWithinBounds(request, down)) {
                         return Move.DOWN;
                     }
                     break;
@@ -113,9 +113,9 @@ public class RequestController {
                     left[0] = left[0] - 1;
 
                     int[] left2 = head.clone();
-                    left2[0] = left2[0] - 1;
+                    left2[0] = left2[0] - 2;
 
-                    if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2) && isOutOfBounds(request, left)) {
+                    if (!collideWithSnake(snake, left) && !collideWithSnake(snake, left2) && isWithinBounds(request, left)) {
                         return Move.LEFT;
                     }
                     break;
@@ -124,9 +124,9 @@ public class RequestController {
                     right[0] = right[0] + 1;
 
                     int[] right2 = head.clone();
-                    right2[0] = right2[0] + 1;
+                    right2[0] = right2[0] + 2;
 
-                    if (!collideWithSnake(snake, right) && !collideWithSnake(snake, right2) && isOutOfBounds(request, right)) {
+                    if (!collideWithSnake(snake, right) && !collideWithSnake(snake, right2) && isWithinBounds(request, right)) {
                         return Move.RIGHT;
                     }
             }
